@@ -1,0 +1,54 @@
+export interface Candidate {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  skills: string[];
+  experience: number; // in years
+  lastEmployed: string; // ISO date string
+  daysSinceLastJob: number;
+  status: 'active' | 'placed' | 'on hold';
+  notes: string;
+  avatar?: string;
+}
+
+export interface JobRole {
+  id: string;
+  title: string;
+  company: string;
+  location: string;
+  description: string;
+  requirements: string[];
+  salary: {
+    min: number;
+    max: number;
+    currency: string;
+  };
+  postedDate: string; // ISO date string
+  deadlineDate: string; // ISO date string
+  status: 'open' | 'filled' | 'closed';
+  isNew: boolean;
+}
+
+export interface Presentation {
+  id: string;
+  candidateId: string;
+  jobRoleId: string;
+  status: 'submitted' | 'screening' | 'interview' | 'technical' | 'offer' | 'rejected' | 'accepted';
+  submittedDate: string; // ISO date string
+  lastUpdated: string; // ISO date string
+  notes: string;
+  nextStep?: {
+    type: string;
+    date: string;
+  };
+}
+
+export interface DashboardMetrics {
+  activeCandidates: number;
+  openRoles: number;
+  pendingPresentations: number;
+  recentPlacements: number;
+  urgentCandidates: number; // Candidates without work for >30 days
+  upcomingInterviews: number;
+}

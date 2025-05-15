@@ -3,7 +3,8 @@ import { NavLink } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Users, 
-  Briefcase, 
+  Briefcase,
+  Building2,
   PresentationIcon,
   Settings,
   CalendarClock,
@@ -71,6 +72,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
             icon={<Briefcase size={20} />} 
             label="Job Roles" 
             badge={2}
+          />
+          <NavItem 
+            to="/employers" 
+            icon={<Building2 size={20} />} 
+            label="Employers" 
           />
           <NavItem 
             to="/presentations" 

@@ -3,11 +3,14 @@ import { Card, CardHeader, CardContent } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { ProgressBar } from '../components/ui/ProgressBar';
-import { presentations, candidates, jobRoles } from '../data/mockData';
 import { formatDate } from '../utils/dateUtils';
 import { Search, Plus, Filter, ArrowUpDown } from 'lucide-react';
+import { usePresentations, useCandidates, useJobs } from '../hooks/useDashboard';
 
 export const PresentationsPage: React.FC = () => {
+  const { presentations, createPresentation } = usePresentations();
+  const { candidates } = useCandidates();
+  const { jobs } = useJobs();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   
@@ -30,7 +33,7 @@ export const PresentationsPage: React.FC = () => {
       if (statusFilter && presentation.status !== statusFilter) return false;
       
       const candidate = candidates.find(c => c.id === presentation.candidateId);
-      const job = jobRoles.find(j => j.id === presentation.jobRoleId);
+      const job = jobs.find(j => j.id === presentation.jobRoleId);
       
       if (!candidate || !job) return false;
       
@@ -45,7 +48,7 @@ export const PresentationsPage: React.FC = () => {
   // Helper to get candidate and job details
   const getDetails = (presentation: any) => {
     const candidate = candidates.find(c => c.id === presentation.candidateId);
-    const job = jobRoles.find(j => j.id === presentation.jobRoleId);
+    const job = jobs.find(j => j.id === presentation.jobRoleId);
     return { candidate, job };
   };
   

@@ -52,3 +52,25 @@ export interface DashboardMetrics {
   urgentCandidates: number; // Candidates without work for >30 days
   upcomingInterviews: number;
 }
+
+export interface Employer {
+  id: string;
+  name: string;
+  logo?: string;
+  industry: string;
+  location: string;
+  metrics: {
+    totalJobs: number;
+    activeJobs: number;
+    totalPlacements: number;
+    activeCandidates: number;
+    successRate: number;
+    averageTimeToHire: number;
+  };
+  contactInfo: {
+    name: string;
+    email: string;
+    phone: string;
+    role: string;
+  };
+}

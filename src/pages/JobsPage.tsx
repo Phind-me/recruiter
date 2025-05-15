@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { Card, CardHeader, CardContent } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
-import { jobRoles } from '../data/mockData';
 import { formatDate, formatSalary } from '../utils/dateUtils';
 import { Search, Plus, Filter, ArrowUpDown, MapPin, DollarSign, Calendar } from 'lucide-react';
+import { useJobs } from '../hooks/useDashboard';
 
 export const JobsPage: React.FC = () => {
+  const { jobs, createJob } = useJobs();
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<string>('postedDate');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
@@ -20,7 +21,7 @@ export const JobsPage: React.FC = () => {
     }
   };
   
-  const filteredJobs = jobRoles
+  const filteredJobs = jobs
     .filter(job => 
       job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       job.company.toLowerCase().includes(searchQuery.toLowerCase()) ||

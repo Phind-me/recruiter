@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { Card, CardHeader, CardContent } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
-import { candidates } from '../data/mockData';
 import { formatDate } from '../utils/dateUtils';
 import { Search, Plus, Filter, ArrowUpDown } from 'lucide-react';
+import { useCandidates } from '../hooks/useDashboard';
 
 export const CandidatesPage: React.FC = () => {
+  const { candidates, createCandidate } = useCandidates();
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<string>('daysSinceLastJob');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');

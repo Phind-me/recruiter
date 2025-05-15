@@ -1,6 +1,5 @@
-import { Candidate, JobRole, Presentation, DashboardMetrics } from '../types';
+import { Candidate, JobRole, Presentation, DashboardMetrics, Employer } from '../types';
 
-// Mock data for development
 export const candidates: Candidate[] = [
   {
     id: '1',
@@ -247,3 +246,69 @@ export const dashboardMetrics: DashboardMetrics = {
     new Date(p.nextStep.date) < new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
   ).length
 };
+
+export const employers: Employer[] = [
+  {
+    id: '1',
+    name: 'TechCorp Solutions',
+    logo: 'https://images.pexels.com/photos/2977565/pexels-photo-2977565.jpeg?auto=compress&cs=tinysrgb&w=300',
+    industry: 'Technology',
+    location: 'San Francisco, CA',
+    metrics: {
+      totalJobs: 15,
+      activeJobs: 8,
+      totalPlacements: 12,
+      activeCandidates: 6,
+      successRate: 80,
+      averageTimeToHire: 25
+    },
+    contactInfo: {
+      name: 'Sarah Chen',
+      email: 'sarah.chen@techcorp.com',
+      phone: '(555) 123-4567',
+      role: 'Head of Talent Acquisition'
+    }
+  },
+  {
+    id: '2',
+    name: 'FinanceApp Inc',
+    logo: 'https://images.pexels.com/photos/730547/pexels-photo-730547.jpeg?auto=compress&cs=tinysrgb&w=300',
+    industry: 'FinTech',
+    location: 'New York, NY',
+    metrics: {
+      totalJobs: 10,
+      activeJobs: 4,
+      totalPlacements: 8,
+      activeCandidates: 5,
+      successRate: 75,
+      averageTimeToHire: 30
+    },
+    contactInfo: {
+      name: 'Michael Rodriguez',
+      email: 'm.rodriguez@financeapp.com',
+      phone: '(555) 987-6543',
+      role: 'Recruiting Manager'
+    }
+  },
+  {
+    id: '3',
+    name: 'HealthTech Innovations',
+    logo: 'https://images.pexels.com/photos/1170979/pexels-photo-1170979.jpeg?auto=compress&cs=tinysrgb&w=300',
+    industry: 'Healthcare Technology',
+    location: 'Boston, MA',
+    metrics: {
+      totalJobs: 8,
+      activeJobs: 3,
+      totalPlacements: 6,
+      activeCandidates: 4,
+      successRate: 85,
+      averageTimeToHire: 28
+    },
+    contactInfo: {
+      name: 'Emily Thompson',
+      email: 'e.thompson@healthtech.com',
+      phone: '(555) 234-5678',
+      role: 'Senior Technical Recruiter'
+    }
+  }
+];

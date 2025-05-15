@@ -68,7 +68,7 @@ export const UrgentCandidates: React.FC<UrgentCandidatesProps> = ({ candidates }
                 
                 <div className="mt-3 flex flex-wrap gap-2">
                   {candidate.skills.slice(0, 4).map((skill, index) => (
-                    <Badge key={index} variant="secondary">{skill}</Badge>
+                    <Badge key={index} variant="secondary">{skill.name}</Badge>
                   ))}
                   {candidate.skills.length > 4 && (
                     <Badge variant="secondary">+{candidate.skills.length - 4} more</Badge>

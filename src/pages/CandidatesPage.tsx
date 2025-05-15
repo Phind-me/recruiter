@@ -5,8 +5,10 @@ import { Button } from '../components/ui/Button';
 import { formatDate } from '../utils/dateUtils';
 import { Search, Plus, Filter, ArrowUpDown } from 'lucide-react';
 import { useCandidates } from '../hooks/useDashboard';
+import { useNavigate } from 'react-router-dom';
 
 export const CandidatesPage: React.FC = () => {
+  const navigate = useNavigate();
   const { candidates, createCandidate } = useCandidates();
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<string>('daysSinceLastJob');
@@ -147,7 +149,12 @@ export const CandidatesPage: React.FC = () => {
                           </div>
                         )}
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">{candidate.name}</div>
+                          <button
+                            onClick={() => navigate(`/candidates/${candidate.id}`)}
+                            className="text-sm font-medium text-gray-900 hover:text-blue-600"
+                          >
+                            {candidate.name}
+                          </button>
                           <div className="text-sm text-gray-500">{candidate.email}</div>
                         </div>
                       </div>
@@ -155,7 +162,7 @@ export const CandidatesPage: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex flex-wrap gap-1">
                         {candidate.skills.slice(0, 3).map((skill, index) => (
-                          <Badge key={index} variant="secondary">{skill}</Badge>
+                          <Badge key={index} variant="secondary">{skill.name}</Badge>
                         ))}
                         {candidate.skills.length > 3 && (
                           <Badge variant="secondary">+{candidate.skills.length - 3}</Badge>
@@ -186,7 +193,11 @@ export const CandidatesPage: React.FC = () => {
                       </Badge>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <Button variant="ghost" size="sm">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => navigate(`/candidates/${candidate.id}`)}
+                      >
                         View
                       </Button>
                       <Button variant="ghost" size="sm">

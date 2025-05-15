@@ -3,6 +3,7 @@ import { CandidatesContext } from '../contexts/CandidatesContext';
 import { JobsContext } from '../contexts/JobsContext';
 import { PresentationsContext } from '../contexts/PresentationsContext';
 import { EmployersContext } from '../contexts/EmployersContext';
+import { MessagesContext } from '../contexts/MessagesContext';
 
 export const useCandidates = () => {
   const context = useContext(CandidatesContext);
@@ -32,6 +33,14 @@ export const useEmployers = () => {
   const context = useContext(EmployersContext);
   if (context === undefined) {
     throw new Error('useEmployers must be used within a EmployersProvider');
+  }
+  return context;
+};
+
+export const useMessages = () => {
+  const context = useContext(MessagesContext);
+  if (context === undefined) {
+    throw new Error('useMessages must be used within a MessagesProvider');
   }
   return context;
 };

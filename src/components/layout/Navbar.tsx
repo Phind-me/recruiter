@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
-import { Menu, X, BellRing, Search, User } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Menu, BellRing, Search, User, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useMessages } from '../../hooks/useDashboard';
+import { timeAgo } from '../../utils/dateUtils';
 
 interface NavbarProps {
   onToggleSidebar: () => void;
@@ -8,12 +10,25 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
   const [showNotifications, setShowNotifications] = useState(false);
-  
-  const notifications = [
-    { id: 1, message: 'New job role: Senior Frontend Developer at TechCorp', time: '10 minutes ago' },
-    { id: 2, message: 'Alex Johnson interview scheduled for tomorrow', time: '2 hours ago' },
-    { id: 3, message: 'Candidate Priya Patel updated profile', time: '5 hours ago' },
-  ];
+  const { messages, unreadCount, markAsRead, markAllAsRead } = useMessages();
+  const notificationsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
+        setShowNotifications(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handleNotificationClick = (id: string) => {
+    markAsRead(id);
+  };
 
   return (
     <nav className="bg-white border-b border-gray-200">
@@ -48,14 +63,16 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
               </div>
             </div>
             
-            <div className="ml-4 relative">
+            <div className="ml-4 relative" ref={notificationsRef}>
               <button 
                 onClick={() => setShowNotifications(!showNotifications)}
                 className="p-2 rounded-md text-gray-500 hover:text-gray-700 focus:outline-none"
               >
-                <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-red-500 flex items-center justify-center text-xs text-white">
-                  3
-                </span>
+                {unreadCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-red-500 flex items-center justify-center text-xs text-white">
+                    {unreadCount}
+                  </span>
+                )}
                 <BellRing size={20} />
               </button>
               
@@ -64,23 +81,49 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
                   <div className="py-2 px-4 border-b border-gray-100">
                     <div className="flex justify-between items-center">
                       <h3 className="text-sm font-medium text-gray-900">Notifications</h3>
-                      <button className="text-xs text-blue-500 hover:text-blue-600">Mark all as read</button>
+                      <button 
+                        onClick={markAllAsRead}
+                        className="text-xs text-blue-500 hover:text-blue-600"
+                      >
+                        Mark all as read
+                      </button>
                     </div>
                   </div>
-                  <div className="max-h-60 overflow-y-auto py-1">
-                    {notifications.map((notification) => (
-                      <a
-                        key={notification.id}
-                        href="#"
-                        className="block px-4 py-3 hover:bg-gray-50 transition-colors"
-                      >
-                        <p className="text-sm text-gray-700">{notification.message}</p>
-                        <p className="text-xs text-gray-500 mt-1">{notification.time}</p>
-                      </a>
-                    ))}
-                  </div>
-                  <div className="py-2 px-4 border-t border-gray-100">
-                    <a href="#" className="text-xs text-blue-500 hover:text-blue-600">View all notifications</a>
+                  <div className="max-h-96 overflow-y-auto">
+                    {messages.length === 0 ? (
+                      <div className="py-8 text-center text-gray-500">
+                        <p className="text-sm">No notifications</p>
+                      </div>
+                    ) : (
+                      <div className="py-1">
+                        {messages.map((message) => (
+                          <div
+                            key={message.id}
+                            className={`px-4 py-3 hover:bg-gray-50 transition-colors ${!message.read ? 'bg-blue-50' : ''}`}
+                          >
+                            <div className="flex justify-between items-start">
+                              <div className="flex-1">
+                                <p className="text-sm font-medium text-gray-900">{message.title}</p>
+                                <p className="text-sm text-gray-600 mt-0.5">{message.content}</p>
+                                <p className="text-xs text-gray-500 mt-1">{timeAgo(message.timestamp)}</p>
+                                {message.link && (
+                                  <Link
+                                    to={message.link.url}
+                                    onClick={() => handleNotificationClick(message.id)}
+                                    className="text-sm text-blue-500 hover:text-blue-600 mt-2 inline-block"
+                                  >
+                                    {message.link.text}
+                                  </Link>
+                                )}
+                              </div>
+                              {!message.read && (
+                                <div className="h-2 w-2 bg-blue-500 rounded-full mt-1.5"></div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               )}

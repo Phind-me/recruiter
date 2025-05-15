@@ -6,7 +6,32 @@ export const candidates: Candidate[] = [
     name: 'Alex Johnson',
     email: 'alex.johnson@example.com',
     phone: '(555) 123-4567',
-    skills: ['JavaScript', 'React', 'Node.js', 'TypeScript'],
+    skills: [
+      {
+        name: 'JavaScript',
+        years: 5,
+        startDate: '2019-01',
+        endDate: '2024-03'
+      },
+      {
+        name: 'React',
+        years: 4,
+        startDate: '2020-01',
+        endDate: '2024-03'
+      },
+      {
+        name: 'Node.js',
+        years: 3,
+        startDate: '2021-01',
+        endDate: '2024-03'
+      },
+      {
+        name: 'TypeScript',
+        years: 2,
+        startDate: '2022-01',
+        endDate: '2024-03'
+      }
+    ],
     experience: 5,
     lastEmployed: '2023-02-15',
     daysSinceLastJob: 410,
@@ -19,7 +44,32 @@ export const candidates: Candidate[] = [
     name: 'Samantha Chen',
     email: 'samantha.chen@example.com',
     phone: '(555) 987-6543',
-    skills: ['Product Management', 'Agile', 'Data Analysis', 'UX Research'],
+    skills: [
+      {
+        name: 'Product Management',
+        years: 7,
+        startDate: '2017-01',
+        endDate: '2024-03'
+      },
+      {
+        name: 'Agile',
+        years: 6,
+        startDate: '2018-01',
+        endDate: '2024-03'
+      },
+      {
+        name: 'Data Analysis',
+        years: 5,
+        startDate: '2019-01',
+        endDate: '2024-03'
+      },
+      {
+        name: 'UX Research',
+        years: 4,
+        startDate: '2020-01',
+        endDate: '2024-03'
+      }
+    ],
     experience: 7,
     lastEmployed: '2023-11-30',
     daysSinceLastJob: 130,
@@ -32,7 +82,32 @@ export const candidates: Candidate[] = [
     name: 'Marcus Williams',
     email: 'marcus.williams@example.com',
     phone: '(555) 234-5678',
-    skills: ['Java', 'Spring Boot', 'Microservices', 'AWS'],
+    skills: [
+      {
+        name: 'Java',
+        years: 8,
+        startDate: '2016-01',
+        endDate: '2024-03'
+      },
+      {
+        name: 'Spring Boot',
+        years: 6,
+        startDate: '2018-01',
+        endDate: '2024-03'
+      },
+      {
+        name: 'Microservices',
+        years: 5,
+        startDate: '2019-01',
+        endDate: '2024-03'
+      },
+      {
+        name: 'AWS',
+        years: 4,
+        startDate: '2020-01',
+        endDate: '2024-03'
+      }
+    ],
     experience: 8,
     lastEmployed: '2023-08-15',
     daysSinceLastJob: 237,
@@ -45,7 +120,32 @@ export const candidates: Candidate[] = [
     name: 'Priya Patel',
     email: 'priya.patel@example.com',
     phone: '(555) 876-5432',
-    skills: ['Data Science', 'Python', 'Machine Learning', 'SQL'],
+    skills: [
+      {
+        name: 'Data Science',
+        years: 4,
+        startDate: '2020-01',
+        endDate: '2024-03'
+      },
+      {
+        name: 'Python',
+        years: 5,
+        startDate: '2019-01',
+        endDate: '2024-03'
+      },
+      {
+        name: 'Machine Learning',
+        years: 3,
+        startDate: '2021-01',
+        endDate: '2024-03'
+      },
+      {
+        name: 'SQL',
+        years: 4,
+        startDate: '2020-01',
+        endDate: '2024-03'
+      }
+    ],
     experience: 4,
     lastEmployed: '2024-02-28',
     daysSinceLastJob: 40,
@@ -58,7 +158,32 @@ export const candidates: Candidate[] = [
     name: 'David Kim',
     email: 'david.kim@example.com',
     phone: '(555) 345-6789',
-    skills: ['UI/UX Design', 'Figma', 'Adobe XD', 'Prototyping'],
+    skills: [
+      {
+        name: 'UI/UX Design',
+        years: 6,
+        startDate: '2018-01',
+        endDate: '2024-03'
+      },
+      {
+        name: 'Figma',
+        years: 4,
+        startDate: '2020-01',
+        endDate: '2024-03'
+      },
+      {
+        name: 'Adobe XD',
+        years: 5,
+        startDate: '2019-01',
+        endDate: '2024-03'
+      },
+      {
+        name: 'Prototyping',
+        years: 6,
+        startDate: '2018-01',
+        endDate: '2024-03'
+      }
+    ],
     experience: 6,
     lastEmployed: '2023-05-10',
     daysSinceLastJob: 334,

@@ -5,8 +5,10 @@ import { Button } from '../components/ui/Button';
 import { formatDate, formatSalary } from '../utils/dateUtils';
 import { Search, Plus, Filter, ArrowUpDown, MapPin, DollarSign, Calendar } from 'lucide-react';
 import { useJobs } from '../hooks/useDashboard';
+import { useNavigate } from 'react-router-dom';
 
 export const JobsPage: React.FC = () => {
+  const navigate = useNavigate();
   const { jobs, createJob } = useJobs();
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<string>('postedDate');
@@ -26,7 +28,7 @@ export const JobsPage: React.FC = () => {
       job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       job.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
       job.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      job.requirements.some(req => req.toLowerCase().includes(searchQuery.toLowerCase()))
+      job.requirements.some(req => req.name.toLowerCase().includes(searchQuery.toLowerCase()))
     )
     .sort((a, b) => {
       const factor = sortDirection === 'asc' ? 1 : -1;
@@ -123,7 +125,12 @@ export const JobsPage: React.FC = () => {
                     <h3 className="text-sm font-medium text-gray-700 mb-2">Requirements:</h3>
                     <div className="flex flex-wrap gap-2">
                       {job.requirements.map((req, index) => (
-                        <Badge key={index} variant="secondary">{req}</Badge>
+                        <Badge 
+                          key={index} 
+                          variant={req.isRequired ? "primary" : "secondary"}
+                        >
+                          {req.name} ({req.yearsRequired}+ years)
+                        </Badge>
                       ))}
                     </div>
                   </div>
@@ -138,7 +145,13 @@ export const JobsPage: React.FC = () => {
                   </Badge>
                   
                   <div className="flex gap-2 mt-auto">
-                    <Button variant="outline" size="sm">View Details</Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => navigate(`/jobs/${job.id}`)}
+                    >
+                      View Details
+                    </Button>
                     <Button variant="primary" size="sm">Find Candidates</Button>
                   </div>
                 </div>

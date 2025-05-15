@@ -6,6 +6,7 @@ import { ProgressBar } from '../components/ui/ProgressBar';
 import { formatDate } from '../utils/dateUtils';
 import { Search, Plus, Filter, ArrowUpDown } from 'lucide-react';
 import { usePresentations, useCandidates, useJobs } from '../hooks/useDashboard';
+import { useNavigate } from 'react-router-dom';
 
 export const PresentationsPage: React.FC = () => {
   const { presentations, createPresentation } = usePresentations();
@@ -13,6 +14,7 @@ export const PresentationsPage: React.FC = () => {
   const { jobs } = useJobs();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const navigate = useNavigate();
   
   // Define the steps in the hiring process
   const hiringSteps = ['Submitted', 'Screening', 'Interview', 'Technical', 'Offer'];
@@ -172,7 +174,13 @@ export const PresentationsPage: React.FC = () => {
                     </div>
                     
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm">View Details</Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => navigate(`/presentations/${presentation.id}`)}
+                      >
+                        View Details
+                      </Button>
                       <Button variant="primary" size="sm">Update Status</Button>
                     </div>
                   </div>

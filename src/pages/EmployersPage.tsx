@@ -4,10 +4,12 @@ import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { useEmployers } from '../hooks/useDashboard';
 import { Search, Plus, Filter, Building2, Users, Clock, TrendingUp, Phone, Mail } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export const EmployersPage: React.FC = () => {
   const { employers } = useEmployers();
   const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
 
   const filteredEmployers = employers.filter(employer =>
     employer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -78,7 +80,13 @@ export const EmployersPage: React.FC = () => {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm">View Details</Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => navigate(`/employers/${employer.id}`)}
+                  >
+                    View Details
+                  </Button>
                   <Button variant="primary" size="sm">Manage Jobs</Button>
                 </div>
               </div>
@@ -148,4 +156,4 @@ export const EmployersPage: React.FC = () => {
       </div>
     </div>
   );
-};
+}

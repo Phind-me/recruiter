@@ -10,6 +10,7 @@ import { PresentationsPage } from './pages/PresentationsPage';
 import { PresentationDetailsPage } from './pages/PresentationDetailsPage';
 import { EmployersPage } from './pages/EmployersPage';
 import { EmployerDetailsPage } from './pages/EmployerDetailsPage';
+import { MessagesPage } from './pages/MessagesPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { CandidatesProvider } from './contexts/CandidatesContext';
 import { JobsProvider } from './contexts/JobsContext';
@@ -36,6 +37,7 @@ function App() {
                     <Route path="presentations/:id" element={<PresentationDetailsPage />} />
                     <Route path="employers" element={<EmployersPage />} />
                     <Route path="employers/:id" element={<EmployerDetailsPage />} />
+                    <Route path="messages" element={<MessagesPage />} />
                     <Route path="*" element={<NotFoundPage />} />
                   </Route>
                 </Routes>
@@ -48,4 +50,4 @@ function App() {
   );
 }
 
-export default App
+export default App;

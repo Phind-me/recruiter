@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardHeader, CardContent } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
@@ -6,18 +6,127 @@ import { Button } from '../components/ui/Button';
 import { ProgressBar } from '../components/ui/ProgressBar';
 import { useCandidates, usePresentations } from '../hooks/useDashboard';
 import { formatDate } from '../utils/dateUtils';
-import { ArrowLeft, Mail, Phone, Calendar, Briefcase, GraduationCap, Award, Clock } from 'lucide-react';
+import { 
+  ArrowLeft, 
+  Mail, 
+  Phone, 
+  Calendar, 
+  Briefcase, 
+  GraduationCap, 
+  Award, 
+  Clock,
+  Plus,
+  Save,
+  X
+} from 'lucide-react';
 
 export const CandidateDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { candidates } = useCandidates();
+  const { candidates, createCandidate, updateCandidate } = useCandidates();
   const { presentations } = usePresentations();
+  const isCreateMode = id === 'new';
+  const [isEditMode, setIsEditMode] = useState(isCreateMode);
 
-  const candidate = candidates.find(c => c.id === id);
-  const candidatePresentations = presentations.filter(p => p.candidateId === id);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    skills: [] as any[],
+    experience: 0,
+    lastEmployed: new Date().toISOString().split('T')[0],
+    status: 'active' as 'active' | 'placed' | 'on hold',
+    notes: '',
+    education: [] as any[],
+    certifications: [] as string[]
+  });
 
-  if (!candidate) {
+  useEffect(() => {
+    if (!isCreateMode && id) {
+      const candidate = candidates.find(c => c.id === id);
+      if (candidate) {
+        setFormData({
+          name: candidate.name,
+          email: candidate.email,
+          phone: candidate.phone,
+          skills: candidate.skills,
+          experience: candidate.experience,
+          lastEmployed: candidate.lastEmployed.split('T')[0],
+          status: candidate.status,
+          notes: candidate.notes,
+          education: [
+            {
+              degree: "Master's in Computer Science",
+              institution: "Stanford University",
+              year: "2018-2020"
+            },
+            {
+              degree: "Bachelor's in Software Engineering",
+              institution: "University of California, Berkeley",
+              year: "2014-2018"
+            }
+          ],
+          certifications: [
+            "AWS Certified Solutions Architect",
+            "Google Cloud Professional Developer",
+            "MongoDB Certified Developer"
+          ]
+        });
+      }
+    }
+  }, [id, isCreateMode, candidates]);
+
+  const handleInputChange = (field: string, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleAddSkill = () => {
+    setFormData(prev => ({
+      ...prev,
+      skills: [...prev.skills, {
+        name: '',
+        years: 0,
+        startDate: new Date().toISOString().split('T')[0],
+        endDate: new Date().toISOString().split('T')[0]
+      }]
+    }));
+  };
+
+  const handleSkillChange = (index: number, field: string, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      skills: prev.skills.map((skill, i) => 
+        i === index ? { ...skill, [field]: value } : skill
+      )
+    }));
+  };
+
+  const handleRemoveSkill = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      skills: prev.skills.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleSave = () => {
+    const candidateData = {
+      ...formData,
+      daysSinceLastJob: Math.floor((Date.now() - new Date(formData.lastEmployed).getTime()) / (1000 * 60 * 60 * 24))
+    };
+
+    if (isCreateMode) {
+      createCandidate(candidateData);
+      navigate('/candidates');
+    } else if (id) {
+      updateCandidate(id, candidateData);
+      setIsEditMode(false);
+    }
+  };
+
+  const candidate = !isCreateMode && id ? candidates.find(c => c.id === id) : null;
+  const candidatePresentations = !isCreateMode && id ? presentations.filter(p => p.candidateId === id) : [];
+
+  if (!isCreateMode && !candidate) {
     return (
       <div className="text-center py-12">
         <h2 className="text-2xl font-bold text-gray-900">Candidate not found</h2>
@@ -32,43 +141,6 @@ export const CandidateDetailsPage: React.FC = () => {
     );
   }
 
-  // Mock education data (in a real app, this would come from the API)
-  const education = [
-    {
-      degree: "Master's in Computer Science",
-      institution: "Stanford University",
-      year: "2018-2020"
-    },
-    {
-      degree: "Bachelor's in Software Engineering",
-      institution: "University of California, Berkeley",
-      year: "2014-2018"
-    }
-  ];
-
-  // Mock work experience data
-  const experience = [
-    {
-      role: "Senior Software Engineer",
-      company: "Tech Solutions Inc.",
-      period: "2020-2023",
-      description: "Led development of cloud-based applications using React and Node.js"
-    },
-    {
-      role: "Software Engineer",
-      company: "Innovation Labs",
-      period: "2018-2020",
-      description: "Developed and maintained multiple web applications"
-    }
-  ];
-
-  // Mock certifications
-  const certifications = [
-    "AWS Certified Solutions Architect",
-    "Google Cloud Professional Developer",
-    "MongoDB Certified Developer"
-  ];
-
   const hiringSteps = ['Submitted', 'Screening', 'Interview', 'Technical', 'Offer'];
 
   return (
@@ -82,6 +154,14 @@ export const CandidateDetailsPage: React.FC = () => {
         >
           Back to Candidates
         </Button>
+        {!isCreateMode && !isEditMode && (
+          <Button
+            variant="primary"
+            onClick={() => setIsEditMode(true)}
+          >
+            Edit Candidate
+          </Button>
+        )}
       </div>
 
       <div className="grid grid-cols-3 gap-6">
@@ -90,7 +170,7 @@ export const CandidateDetailsPage: React.FC = () => {
           <Card>
             <CardContent className="p-6">
               <div className="flex items-start gap-6">
-                {candidate.avatar ? (
+                {!isEditMode && candidate?.avatar ? (
                   <img
                     src={candidate.avatar}
                     alt={candidate.name}
@@ -99,7 +179,7 @@ export const CandidateDetailsPage: React.FC = () => {
                 ) : (
                   <div className="h-24 w-24 rounded-lg bg-blue-100 flex items-center justify-center">
                     <span className="text-2xl font-semibold text-blue-600">
-                      {candidate.name.split(' ').map(n => n[0]).join('')}
+                      {formData.name ? formData.name.split(' ').map(n => n[0]).join('') : '?'}
                     </span>
                   </div>
                 )}
@@ -107,60 +187,179 @@ export const CandidateDetailsPage: React.FC = () => {
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h1 className="text-2xl font-bold text-gray-900">{candidate.name}</h1>
-                      <p className="text-gray-600 mt-1">Software Engineer • {candidate.experience} years experience</p>
+                      {isEditMode ? (
+                        <input
+                          type="text"
+                          value={formData.name}
+                          onChange={(e) => handleInputChange('name', e.target.value)}
+                          className="text-2xl font-bold text-gray-900 border-b border-gray-300 focus:border-blue-500 focus:outline-none"
+                          placeholder="Candidate Name"
+                        />
+                      ) : (
+                        <h1 className="text-2xl font-bold text-gray-900">{formData.name}</h1>
+                      )}
+                      {isEditMode ? (
+                        <div className="flex items-center gap-2 mt-1">
+                          <input
+                            type="number"
+                            value={formData.experience}
+                            onChange={(e) => handleInputChange('experience', parseInt(e.target.value))}
+                            className="w-16 text-gray-600 border-b border-gray-300 focus:border-blue-500 focus:outline-none"
+                          />
+                          <span className="text-gray-600">years experience</span>
+                        </div>
+                      ) : (
+                        <p className="text-gray-600 mt-1">
+                          Software Engineer • {formData.experience} years experience
+                        </p>
+                      )}
                     </div>
-                    <Badge
-                      variant={candidate.status === 'active' ? 'success' : 'secondary'}
-                      className="text-sm"
-                    >
-                      {candidate.status}
-                    </Badge>
+                    {isEditMode ? (
+                      <select
+                        value={formData.status}
+                        onChange={(e) => handleInputChange('status', e.target.value)}
+                        className="border border-gray-300 rounded-md px-2 py-1"
+                      >
+                        <option value="active">Active</option>
+                        <option value="placed">Placed</option>
+                        <option value="on hold">On Hold</option>
+                      </select>
+                    ) : (
+                      <Badge
+                        variant={formData.status === 'active' ? 'success' : 'secondary'}
+                        className="text-sm"
+                      >
+                        {formData.status}
+                      </Badge>
+                    )}
                   </div>
 
                   <div className="mt-4 grid grid-cols-2 gap-4">
                     <div className="flex items-center text-gray-600">
                       <Mail size={18} className="mr-2" />
-                      <a href={`mailto:${candidate.email}`} className="hover:text-blue-600">
-                        {candidate.email}
-                      </a>
+                      {isEditMode ? (
+                        <input
+                          type="email"
+                          value={formData.email}
+                          onChange={(e) => handleInputChange('email', e.target.value)}
+                          className="border-b border-gray-300 focus:border-blue-500 focus:outline-none"
+                          placeholder="Email"
+                        />
+                      ) : (
+                        <a href={`mailto:${formData.email}`} className="hover:text-blue-600">
+                          {formData.email}
+                        </a>
+                      )}
                     </div>
                     <div className="flex items-center text-gray-600">
                       <Phone size={18} className="mr-2" />
-                      <a href={`tel:${candidate.phone}`} className="hover:text-blue-600">
-                        {candidate.phone}
-                      </a>
+                      {isEditMode ? (
+                        <input
+                          type="tel"
+                          value={formData.phone}
+                          onChange={(e) => handleInputChange('phone', e.target.value)}
+                          className="border-b border-gray-300 focus:border-blue-500 focus:outline-none"
+                          placeholder="Phone"
+                        />
+                      ) : (
+                        <a href={`tel:${formData.phone}`} className="hover:text-blue-600">
+                          {formData.phone}
+                        </a>
+                      )}
                     </div>
                   </div>
                 </div>
               </div>
 
               <div className="mt-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-3">Skills & Experience</h2>
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-lg font-semibold text-gray-900">Skills & Experience</h2>
+                  {isEditMode && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleAddSkill}
+                      leftIcon={<Plus size={16} />}
+                    >
+                      Add Skill
+                    </Button>
+                  )}
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {candidate.skills.map((skill, index) => (
+                  {formData.skills.map((skill, index) => (
                     <div
                       key={index}
                       className="bg-gray-50 rounded-lg p-4 border border-gray-100"
                     >
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-medium text-gray-900">{skill.name}</h3>
-                        <Badge variant="primary">{skill.years} years</Badge>
-                      </div>
-                      <div className="flex items-center text-sm text-gray-600">
-                        <Clock size={16} className="mr-2" />
-                        <span>
-                          {new Date(skill.startDate).toLocaleDateString('en-US', { 
-                            year: 'numeric',
-                            month: 'short'
-                          })} 
-                          {' - '}
-                          {new Date(skill.endDate).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'short'
-                          })}
-                        </span>
-                      </div>
+                      {isEditMode ? (
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <input
+                              type="text"
+                              value={skill.name}
+                              onChange={(e) => handleSkillChange(index, 'name', e.target.value)}
+                              className="font-medium text-gray-900 border-b border-gray-300 focus:border-blue-500 focus:outline-none"
+                              placeholder="Skill name"
+                            />
+                            <button
+                              onClick={() => handleRemoveSkill(index)}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              <X size={16} />
+                            </button>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="number"
+                              value={skill.years}
+                              onChange={(e) => handleSkillChange(index, 'years', parseInt(e.target.value))}
+                              className="w-16 border-b border-gray-300 focus:border-blue-500 focus:outline-none"
+                            />
+                            <span className="text-gray-600">years</span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              <label className="text-xs text-gray-500">Start Date</label>
+                              <input
+                                type="date"
+                                value={skill.startDate}
+                                onChange={(e) => handleSkillChange(index, 'startDate', e.target.value)}
+                                className="w-full border rounded-md px-2 py-1 mt-1"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs text-gray-500">End Date</label>
+                              <input
+                                type="date"
+                                value={skill.endDate}
+                                onChange={(e) => handleSkillChange(index, 'endDate', e.target.value)}
+                                className="w-full border rounded-md px-2 py-1 mt-1"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="flex items-center justify-between mb-2">
+                            <h3 className="font-medium text-gray-900">{skill.name}</h3>
+                            <Badge variant="primary">{skill.years} years</Badge>
+                          </div>
+                          <div className="flex items-center text-sm text-gray-600">
+                            <Clock size={16} className="mr-2" />
+                            <span>
+                              {new Date(skill.startDate).toLocaleDateString('en-US', { 
+                                year: 'numeric',
+                                month: 'short'
+                              })} 
+                              {' - '}
+                              {new Date(skill.endDate).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short'
+                              })}
+                            </span>
+                          </div>
+                        </>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -168,8 +367,37 @@ export const CandidateDetailsPage: React.FC = () => {
 
               <div className="mt-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-3">Notes</h2>
-                <p className="text-gray-600">{candidate.notes}</p>
+                {isEditMode ? (
+                  <textarea
+                    value={formData.notes}
+                    onChange={(e) => handleInputChange('notes', e.target.value)}
+                    className="w-full h-32 border rounded-md p-2 focus:border-blue-500 focus:outline-none"
+                    placeholder="Add notes about the candidate..."
+                  />
+                ) : (
+                  <p className="text-gray-600">{formData.notes}</p>
+                )}
               </div>
+
+              {isEditMode && (
+                <div className="mt-6 flex justify-end gap-2">
+                  {!isCreateMode && (
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsEditMode(false)}
+                    >
+                      Cancel
+                    </Button>
+                  )}
+                  <Button
+                    variant="primary"
+                    onClick={handleSave}
+                    leftIcon={<Save size={16} />}
+                  >
+                    {isCreateMode ? 'Create Candidate' : 'Save Changes'}
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -183,16 +411,15 @@ export const CandidateDetailsPage: React.FC = () => {
             </CardHeader>
             <CardContent className="p-6">
               <div className="space-y-6">
-                {experience.map((exp, index) => (
+                {formData.education.map((exp, index) => (
                   <div key={index} className="border-l-2 border-gray-200 pl-4 pb-6 last:pb-0">
                     <div className="flex justify-between items-start">
                       <div>
-                        <h3 className="font-medium text-gray-900">{exp.role}</h3>
-                        <p className="text-gray-600">{exp.company}</p>
+                        <h3 className="font-medium text-gray-900">{exp.degree}</h3>
+                        <p className="text-gray-600">{exp.institution}</p>
                       </div>
-                      <span className="text-sm text-gray-500">{exp.period}</span>
+                      <span className="text-sm text-gray-500">{exp.year}</span>
                     </div>
-                    <p className="mt-2 text-gray-600">{exp.description}</p>
                   </div>
                 ))}
               </div>
@@ -209,7 +436,7 @@ export const CandidateDetailsPage: React.FC = () => {
             </CardHeader>
             <CardContent className="p-6">
               <div className="space-y-6">
-                {education.map((edu, index) => (
+                {formData.education.map((edu, index) => (
                   <div key={index} className="border-l-2 border-gray-200 pl-4 pb-6 last:pb-0">
                     <div className="flex justify-between items-start">
                       <div>
@@ -226,100 +453,103 @@ export const CandidateDetailsPage: React.FC = () => {
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Status Card */}
-          <Card>
-            <CardHeader>
-              <h2 className="text-lg font-semibold text-gray-900">Current Status</h2>
-            </CardHeader>
-            <CardContent className="p-6">
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm text-gray-500">Last Employed</p>
-                  <div className="flex items-center mt-1">
-                    <Calendar size={18} className="text-gray-400 mr-2" />
-                    <span className="font-medium text-gray-900">
-                      {formatDate(candidate.lastEmployed)}
-                    </span>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Days Since Last Job</p>
-                  <p className={`font-medium ${
-                    candidate.daysSinceLastJob > 180 ? 'text-red-600' : 'text-gray-900'
-                  }`}>
-                    {candidate.daysSinceLastJob} days
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Certifications */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center">
-                <Award size={20} className="text-gray-500 mr-2" />
-                <h2 className="text-lg font-semibold text-gray-900">Certifications</h2>
-              </div>
-            </CardHeader>
-            <CardContent className="p-6">
-              <ul className="space-y-3">
-                {certifications.map((cert, index) => (
-                  <li key={index} className="flex items-center">
-                    <Badge variant="success" className="mr-2">✓</Badge>
-                    <span className="text-gray-700">{cert}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-
-          {/* Active Presentations */}
-          <Card>
-            <CardHeader>
-              <h2 className="text-lg font-semibold text-gray-900">Active Presentations</h2>
-            </CardHeader>
-            <CardContent className="p-6">
-              {candidatePresentations.length === 0 ? (
-                <p className="text-gray-500 text-center">No active presentations</p>
-              ) : (
-                <div className="space-y-6">
-                  {candidatePresentations.map((presentation) => (
-                    <div key={presentation.id} className="space-y-4">
-                      <div className="flex justify-between items-center">
-                        <Badge variant={
-                          presentation.status === 'rejected' ? 'danger' :
-                          presentation.status === 'accepted' ? 'success' :
-                          'primary'
-                        }>
-                          {presentation.status}
-                        </Badge>
-                        <span className="text-sm text-gray-500">
-                          {formatDate(presentation.lastUpdated)}
-                        </span>
-                      </div>
-
-                      {presentation.status !== 'rejected' && (
-                        <ProgressBar
-                          steps={hiringSteps}
-                          currentStep={hiringSteps.indexOf(presentation.status)}
+        {!isCreateMode && (
+          <div className="space-y-6">
+            {/* Status Card */}
+            <Card>
+              <CardHeader>
+                <h2 className="text-lg font-semibold text-gray-900">Current Status</h2>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm text-gray-500">Last Employed</p>
+                    <div className="flex items-center mt-1">
+                      <Calendar size={18} className="text-gray-400 mr-2" />
+                      {isEditMode ? (
+                        <input
+                          type="date"
+                          value={formData.lastEmployed}
+                          onChange={(e) => handleInputChange('lastEmployed', e.target.value)}
+                          className="border rounded-md px-2 py-1"
                         />
-                      )}
-
-                      {presentation.nextStep && (
-                        <div className="text-sm">
-                          <span className="font-medium text-blue-600">Next: </span>
-                          {presentation.nextStep.type} on {formatDate(presentation.nextStep.date)}
-                        </div>
+                      ) : (
+                        <span className="font-medium text-gray-900">
+                          {formatDate(formData.lastEmployed)}
+                        </span>
                       )}
                     </div>
-                  ))}
+                  </div>
                 </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+              </CardContent>
+            </Card>
+
+            {/* Certifications */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-center">
+                  <Award size={20} className="text-gray-500 mr-2" />
+                  <h2 className="text-lg font-semibold text-gray-900">Certifications</h2>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6">
+                <ul className="space-y-3">
+                  {formData.certifications.map((cert, index) => (
+                    <li key={index} className="flex items-center">
+                      <Badge variant="success" className="mr-2">✓</Badge>
+                      <span className="text-gray-700">{cert}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+
+            {/* Active Presentations */}
+            <Card>
+              <CardHeader>
+                <h2 className="text-lg font-semibold text-gray-900">Active Presentations</h2>
+              </CardHeader>
+              <CardContent className="p-6">
+                {candidatePresentations.length === 0 ? (
+                  <p className="text-gray-500 text-center">No active presentations</p>
+                ) : (
+                  <div className="space-y-6">
+                    {candidatePresentations.map((presentation) => (
+                      <div key={presentation.id} className="space-y-4">
+                        <div className="flex justify-between items-center">
+                          <Badge variant={
+                            presentation.status === 'rejected' ? 'danger' :
+                            presentation.status === 'accepted' ? 'success' :
+                            'primary'
+                          }>
+                            {presentation.status}
+                          </Badge>
+                          <span className="text-sm text-gray-500">
+                            {formatDate(presentation.lastUpdated)}
+                          </span>
+                        </div>
+
+                        {presentation.status !== 'rejected' && (
+                          <ProgressBar
+                            steps={hiringSteps}
+                            currentStep={hiringSteps.indexOf(presentation.status)}
+                          />
+                        )}
+
+                        {presentation.nextStep && (
+                          <div className="text-sm">
+                            <span className="font-medium text-blue-600">Next: </span>
+                            {presentation.nextStep.type} on {formatDate(presentation.nextStep.date)}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </div>
     </div>
   );

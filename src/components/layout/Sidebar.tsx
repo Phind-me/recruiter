@@ -9,8 +9,10 @@ import {
   Settings,
   CalendarClock,
   BarChart,
-  LogOut
+  LogOut,
+  Mail
 } from 'lucide-react';
+import { useMessages } from '../../hooks/useDashboard';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -48,6 +50,8 @@ const NavItem: React.FC<NavItemProps> = ({ to, icon, label, badge }) => (
 );
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
+  const { unreadCount } = useMessages();
+  
   return (
     <div className={`
       fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-gray-200 transition-transform duration-300 ease-in-out
@@ -82,6 +86,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
             to="/presentations" 
             icon={<PresentationIcon size={20} />} 
             label="Presentations" 
+          />
+          <NavItem 
+            to="/messages" 
+            icon={<Mail size={20} />} 
+            label="Messages" 
+            badge={unreadCount}
           />
           <NavItem 
             to="/calendar" 

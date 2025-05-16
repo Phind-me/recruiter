@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Menu, BellRing, Search, User, X } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useMessages } from '../../hooks/useDashboard';
 import { timeAgo } from '../../utils/dateUtils';
 
@@ -9,6 +9,7 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
+  const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
   const { messages, unreadCount, markAsRead, markAllAsRead } = useMessages();
   const notificationsRef = useRef<HTMLDivElement>(null);
@@ -28,6 +29,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
 
   const handleNotificationClick = (id: string) => {
     markAsRead(id);
+    setShowNotifications(false);
+    navigate('/messages', { state: { selectedMessage: id } });
   };
 
   return (
@@ -97,30 +100,22 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
                     ) : (
                       <div className="py-1">
                         {messages.map((message) => (
-                          <div
+                          <button
                             key={message.id}
-                            className={`px-4 py-3 hover:bg-gray-50 transition-colors ${!message.read ? 'bg-blue-50' : ''}`}
+                            onClick={() => handleNotificationClick(message.id)}
+                            className={`w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors ${!message.read ? 'bg-blue-50' : ''}`}
                           >
                             <div className="flex justify-between items-start">
                               <div className="flex-1">
                                 <p className="text-sm font-medium text-gray-900">{message.title}</p>
                                 <p className="text-sm text-gray-600 mt-0.5">{message.content}</p>
                                 <p className="text-xs text-gray-500 mt-1">{timeAgo(message.timestamp)}</p>
-                                {message.link && (
-                                  <Link
-                                    to={message.link.url}
-                                    onClick={() => handleNotificationClick(message.id)}
-                                    className="text-sm text-blue-500 hover:text-blue-600 mt-2 inline-block"
-                                  >
-                                    {message.link.text}
-                                  </Link>
-                                )}
                               </div>
                               {!message.read && (
                                 <div className="h-2 w-2 bg-blue-500 rounded-full mt-1.5"></div>
                               )}
                             </div>
-                          </div>
+                          </button>
                         ))}
                       </div>
                     )}

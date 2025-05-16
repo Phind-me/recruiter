@@ -71,7 +71,12 @@ export const EmployersPage: React.FC = () => {
                     </div>
                   )}
                   <div>
-                    <h2 className="text-xl font-semibold text-gray-900">{employer.name}</h2>
+                    <button
+                      onClick={() => navigate(`/employers/${employer.id}`)}
+                      className="text-xl font-semibold text-gray-900 hover:text-blue-600 text-left"
+                    >
+                      {employer.name}
+                    </button>
                     <div className="flex items-center mt-1 space-x-2">
                       <Badge variant="secondary">{employer.industry}</Badge>
                       <span className="text-sm text-gray-500">{employer.location}</span>
@@ -80,13 +85,6 @@ export const EmployersPage: React.FC = () => {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => navigate(`/employers/${employer.id}`)}
-                  >
-                    View Details
-                  </Button>
                   <Button variant="primary" size="sm">Manage Jobs</Button>
                 </div>
               </div>
@@ -156,4 +154,4 @@ export const EmployersPage: React.FC = () => {
       </div>
     </div>
   );
-}
+};

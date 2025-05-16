@@ -91,7 +91,12 @@ export const JobsPage: React.FC = () => {
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center flex-wrap gap-2">
-                    <h2 className="text-xl font-semibold text-gray-900">{job.title}</h2>
+                    <button
+                      onClick={() => navigate(`/jobs/${job.id}`)}
+                      className="text-xl font-semibold text-gray-900 hover:text-blue-600 text-left"
+                    >
+                      {job.title}
+                    </button>
                     {job.isNew && <Badge variant="new">New</Badge>}
                   </div>
                   
@@ -145,13 +150,6 @@ export const JobsPage: React.FC = () => {
                   </Badge>
                   
                   <div className="flex gap-2 mt-auto">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => navigate(`/jobs/${job.id}`)}
-                    >
-                      View Details
-                    </Button>
                     <Button variant="primary" size="sm">Find Candidates</Button>
                   </div>
                 </div>

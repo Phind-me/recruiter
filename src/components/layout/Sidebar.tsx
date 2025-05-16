@@ -53,8 +53,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
   const { unreadCount } = useMessages();
   
   return (
-    <div className={`
-      fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-gray-200 transition-transform duration-300 ease-in-out
+    <aside className={`
+      fixed top-16 bottom-0 left-0 z-30 w-64 bg-white border-r border-gray-200 
+      transform transition-transform duration-300 ease-in-out
       ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       md:translate-x-0
     `}>
@@ -120,6 +121,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
           </button>
         </div>
       </div>
-    </div>
+    </aside>
   );
 };

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardHeader, CardContent } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
-import { ProgressBar } from '../components/ui/ProgressBar';
+import { ReviewStatusBar } from '../components/ui/ReviewStatusBar';
 import { useCandidates, usePresentations } from '../hooks/useDashboard';
 import { formatDate } from '../utils/dateUtils';
 import { 
@@ -27,6 +27,7 @@ export const CandidateDetailsPage: React.FC = () => {
   const { presentations } = usePresentations();
   const isCreateMode = id === 'new';
   const [isEditMode, setIsEditMode] = useState(isCreateMode);
+  const [reviewStatus, setReviewStatus] = useState<'received' | 'reviewed' | 'firstMeet' | 'accepted' | 'rejected'>('received');
 
   const [formData, setFormData] = useState({
     name: '',
@@ -123,6 +124,13 @@ export const CandidateDetailsPage: React.FC = () => {
     }
   };
 
+  const handleStatusChange = (newStatus: 'received' | 'reviewed' | 'firstMeet' | 'accepted' | 'rejected') => {
+    setReviewStatus(newStatus);
+    if (id) {
+      updateCandidate(id, { status: newStatus === 'accepted' ? 'placed' : 'active' });
+    }
+  };
+
   const candidate = !isCreateMode && id ? candidates.find(c => c.id === id) : null;
   const candidatePresentations = !isCreateMode && id ? presentations.filter(p => p.candidateId === id) : [];
 
@@ -140,8 +148,6 @@ export const CandidateDetailsPage: React.FC = () => {
       </div>
     );
   }
-
-  const hiringSteps = ['Submitted', 'Screening', 'Interview', 'Technical', 'Offer'];
 
   return (
     <div className="space-y-6">
@@ -271,7 +277,18 @@ export const CandidateDetailsPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="mt-6">
+              {/* Review Status Bar */}
+              {!isCreateMode && !isEditMode && (
+                <div className="mt-8 pt-6 border-t border-gray-200">
+                  <h3 className="text-lg font-medium text-gray-900 mb-6">Review Status</h3>
+                  <ReviewStatusBar
+                    currentStatus={reviewStatus}
+                    onStatusChange={handleStatusChange}
+                  />
+                </div>
+              )}
+
+              <div className="mt-8 pt-6 border-t border-gray-200">
                 <div className="flex items-center justify-between mb-3">
                   <h2 className="text-lg font-semibold text-gray-900">Skills & Experience</h2>
                   {isEditMode && (
@@ -529,13 +546,6 @@ export const CandidateDetailsPage: React.FC = () => {
                           </span>
                         </div>
 
-                        {presentation.status !== 'rejected' && (
-                          <ProgressBar
-                            steps={hiringSteps}
-                            currentStep={hiringSteps.indexOf(presentation.status)}
-                          />
-                        )}
-
                         {presentation.nextStep && (
                           <div className="text-sm">
                             <span className="font-medium text-blue-600">Next: </span>
@@ -554,3 +564,5 @@ export const CandidateDetailsPage: React.FC = () => {
     </div>
   );
 };
+
+export default CandidateDetailsPage;
